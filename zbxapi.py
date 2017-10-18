@@ -13,7 +13,7 @@ from urllib import request
 
 
 class ZabbixAPI(object):
-    __zbx_objects = ['Action', 'Alert', 'APIInfo', 'Application', 'DCheck', 'DHost', 'DRule',
+    __zbx_objects = ['Action', 'Alert', 'APIInfo', 'Application', 'DCheck', 'Host', 'DRule',
                 'DService', 'Event', 'Graph', 'Graphitem', 'History', 'Host', 'Hostgroup', 'Image', 'Item',
                 'Maintenance', 'Map', 'Mediatype', 'Proxy', 'Screen', 'Script', 'Template', 'Trigger', 'User',
                 'Usergroup', 'Usermacro', 'Usermedia']
@@ -38,7 +38,7 @@ class ZabbixAPI(object):
         self.__url = url.rstrip('/') + '/zabbix/api_jsonrpc.php'
         self.__user = user
         self.__password = password
-        self._zabbix_api_object_list = (item.lower() for item in self.__zbx_objects)
+        self._zabbix_api_object_list = [item.lower() for item in self.__zbx_objects]
 
     def __getattr__(self, name):
         if name not in self._zabbix_api_object_list:
@@ -104,10 +104,10 @@ class ZabbixAPI(object):
     ###################
     #  Exposed Zbx API
     ###################
-    def get_host_by_hostid(self, hostids):
-        if not isinstance(hostids, list):
-           hostids = [hostids]
-        return []
+    # def get_host_by_hostid(self, hostids):
+    #     if not isinstance(hostids, list):
+    #        hostids = [hostids]
+    #     return []
 
 
     ###################
@@ -210,21 +210,9 @@ class ZabbixAPIObjectFactory(object):
         pass
 
 if __name__ == '__main__':
-    zpi = ZabbixAPI('http://10.233.87.241', 'admin', 'zabbix')
-    zpi.login()
+    # zpi = ZabbixAPI('http://10.233.87.241', 'admin', 'zabbix')
+    # zpi.login()
     #NOTE: zapi.(user、host...)等方法必须在用户登录后才能访问
     # print(zpi.apiinfo.version({}))
     # print(zpi.zabbix.status({'nocache': 'true'}))
-
-    var = zpi.host.get({
-        "output": [
-            "hostid",
-            "host"
-        ],
-        "selectInterfaces": [
-            "interfaceid",
-            "ip"
-        ]
-    })
-
-    print(var)
+    pass
