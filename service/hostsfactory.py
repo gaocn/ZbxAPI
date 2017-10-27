@@ -6,7 +6,7 @@
 ################################
 
 from zbxapi import ZabbixAPI
-from exception.ZbxException import E3CZbxException
+from exception.e3cexceptions import E3CZbxException
 
 
 class HostsFactory(object):
@@ -71,7 +71,7 @@ class HostsFactory(object):
         if var:
             return var[0]['templateid']
         else:
-            raise ZbxException('there is no template named "%s"' % self.__template)
+            raise E3CZbxException('there is no template named "%s"' % self.__template)
 
     def __create_host_helper(self, host, templateid, groupid):
         params = {
@@ -119,8 +119,27 @@ class HostsFactory(object):
         for host in self.__hosts:
             self.__create_host_helper(host, templateid, groupid)
 
+    def create_host_link_template_with_params(self, hosts, template_name, group_name):
+        self.__hosts = hosts
+        self.__template = template_name
+        self.__group = group_name
+        self.create_host_link_template()
 
 if __name__ == "__main__":
-    host = HostsFactory('http://10.233.87.241', 'admin', 'zabbix', 'ulog_system_stats_template',
-                        'zbx_zpi', ['10.230.235.184'])
-    host.create_host_link_template()
+
+    NginxServer = ['10.233.87.54']
+    template_name = 'ulog_system_stats_template'
+
+    host = HostsFactory('http://10.233.87.241', 'admin', 'zabbix', template_name,
+                        'Nginx Servers', ['10.233.87.54'])
+    # host.create_host_link_template()
+
+    EsServers = ['10.230.135.126', '10.230.135.127', '10.230.135.128']
+    CollectorServers = ['10.233.86.204', '10.233.86.205', '10.230.146.162', '10.230.146.163']
+    IndexerServers = ['10.233.81.118', '10.230.141.118', '10.233.81.208', '10.230.136.177']
+    KafkaServers = ['10.230.135.124', '10.230.135.125', '10.230.134.225', '10.230.134.226']
+
+    host.create_host_link_template_with_params(EsServers, template_name, "Elasticsearch Servers")
+    host.create_host_link_template_with_params(CollectorServers, template_name, "Collector Servers")
+    host.create_host_link_template_with_params(IndexerServers, template_name, "Indexer Servers")
+    host.create_host_link_template_with_params(KafkaServers, template_name, "Kafka Servers")

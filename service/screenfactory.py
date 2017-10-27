@@ -6,12 +6,12 @@
 ################################
 
 from zbxapi import ZabbixAPI
-from exception.ZbxException import E3CZbxException
+from exception.e3cexceptions import E3CZbxException
 
 
 class ScreenFactory(object):
     """
-    used to create  screen for  a group of hosts
+    used to create  screen for  a group of 'existed hosts' in  Zabbix
     eg:
         for existing hosts: ["10.235.237.1", "10.235.237.2", "10.235.237.3", ...]
         host group: es_servers
@@ -29,8 +29,8 @@ class ScreenFactory(object):
         'CPU_Utilization': ['system.cpu.util[,iowait]', 'system.cpu.util[,user]', 'system.cpu.util[,system]'],
         'Memory': ['vm.memory.size[used]'],
         'Filesystem': ['custom.ulog.fs.stats.used_percent'],
-        'Income_Net_IO': ['net.if.in', 'custom.if.net.income.bandwidth.util'],
-        'Outcome_Net_IO': ['net.if.out', 'custom.if.net.outcome.bandwidth.util'],
+        'Income_Net_IO': ['net.if.in[eth0]', 'custom.if.net.income.bandwidth.util'],
+        'Outcome_Net_IO': ['net.if.out[eth0]', 'custom.if.net.outcome.bandwidth.util'],
         'Read_Disk_IO': ['custom.vfs.dev.iostats.rkb'],
         'Write_Disk_IO': ['custom.vfs.dev.iostats.wkb']
     }
@@ -40,6 +40,11 @@ class ScreenFactory(object):
         'E89DF4'
     ]
     __color_indicator = 0
+
+    def __get_color(self):
+        color = self.__colors[self.__color_indicator]
+        self.__color_indicator = (self.__color_indicator + 1) % len(self.__colors)
+        return color
 
     def __init__(self, url, username, password, hosts, hostgroup):
         self.__url = url
@@ -109,20 +114,16 @@ class ScreenFactory(object):
                 itemid = result[0]['itemid']
                 return itemid
             else:
-                raise E3CZbxException('There are more than one items(%s) in host(hostid=%s)' % (key, hostid))
+                raise E3CZbxException('There are no item or more than one items(%s) in host(hostid=%s)' % (key, hostid))
         except IndexError:
             raise E3CZbxException('There is no key(%s) in host(hostid=%s)' % (key, hostid))
-
-    def __get_color(self):
-        color = self.__colors[self.__color_indicator]
-        self.__color_indicator = (self.__color_indicator + 1) % len(self.__colors)
-        return color
 
     def create_graph(self, name, itemids, width=900,  height=400):
         params = {"name": name, "width": width, "height": height, "gitems": []}
 
         for itemid in itemids:
-            params['gitems'].append({'itemid': itemid, 'color': self.__get_color()})
+            conf = {'itemid': itemid, 'color': self.__get_color()}
+            params['gitems'].append(conf)
         # print(params)
 
         result = self.__zapi.graph.create(params)
@@ -174,9 +175,30 @@ class ScreenFactory(object):
         print("[SUCCESS] create screen: %s(screenid=%s)" % (screen_name, result['screenids'][0]))
         return result['screenids'][0]
 
+    def create_screen_with_params(self, hosts, group_name):
+        self.__hosts = hosts
+        self.__hostgroup = group_name
+        # check if self.__hostgroup exists, if not create it
+        self.get_group_id(self.__hostgroup)
+
+        self.create_screen()
 
 if __name__ == '__main__':
+
+    NginxServers = ['10.233.87.54']
+    group_name = 'Nginx Servers'
     proxy = ScreenFactory('http://10.233.87.241', 'admin', 'zabbix',
-                           ["10.230.135.126", "10.230.135.127", "10.230.135.128"],
-                           "Elasticsearch_Servers")
-    proxy.create_screen()
+                           NginxServers,
+                           group_name)
+    # proxy.create_screen()
+
+    EsServers = ['10.230.135.126', '10.230.135.127', '10.230.135.128']
+    # collectors '10.230.146.162', '10.230.146.163'的网口不是 eth0，导致错误
+    CollectorServers = ['10.233.86.204', '10.233.86.205']
+    IndexerServers = ['10.233.81.118', '10.233.81.208', '10.230.136.177']
+    KafkaServers = ['10.230.135.124', '10.230.135.125', '10.230.134.225', '10.230.134.226']
+
+    # proxy.create_screen_with_params(EsServers, "Elasticsearch Servers")
+    # proxy.create_screen_with_params(CollectorServers, "Collector Servers")
+    # proxy.create_screen_with_params(IndexerServers, "Indexer Servers")
+    # proxy.create_screen_with_params(KafkaServers, "Kafka Servers")

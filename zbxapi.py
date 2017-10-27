@@ -5,7 +5,7 @@
 # Author:  govind
 ################################
 
-from exception.ZbxException import E3CZbxException
+from exception.e3cexceptions import E3CZbxException
 import json
 import subprocess
 import urllib

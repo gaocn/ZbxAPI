@@ -1,1 +1,1 @@
-from exception import ZbxException
+from exception import e3cexceptions
