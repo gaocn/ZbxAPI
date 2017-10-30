@@ -28,11 +28,11 @@ class ScreenFactory(object):
         'CPU_Load': ['system.cpu.load[percpu,avg1]'],
         'CPU_Utilization': ['system.cpu.util[,iowait]', 'system.cpu.util[,user]', 'system.cpu.util[,system]'],
         'Memory': ['vm.memory.size[used]'],
-        'Filesystem': ['custom.ulog.fs.stats.used_percent'],
-        'Income_Net_IO': ['net.if.in[eth0]', 'custom.if.net.income.bandwidth.util'],
-        'Outcome_Net_IO': ['net.if.out[eth0]', 'custom.if.net.outcome.bandwidth.util'],
-        'Read_Disk_IO': ['custom.vfs.dev.iostats.rkb'],
-        'Write_Disk_IO': ['custom.vfs.dev.iostats.wkb']
+        'Filesystem': ['custom.ulog.fs.stats.used_percent[/home]'],
+        'Income_Net_IO': ['net.if.in[eth0,bytes]', 'custom.if.net.income.bandwidth.util'],
+        'Outcome_Net_IO': ['net.if.out[eth0,bytes]', 'custom.if.net.outcome.bandwidth.util'],
+        'Read_Disk_IO': ['custom.vfs.dev.iostats.rkb[sda]'],
+        'Write_Disk_IO': ['custom.vfs.dev.iostats.wkb[sda]']
     }
     __colors = [
         '1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0', '5CCD18',
@@ -46,18 +46,19 @@ class ScreenFactory(object):
         self.__color_indicator = (self.__color_indicator + 1) % len(self.__colors)
         return color
 
-    def __init__(self, url, username, password, hosts, hostgroup):
+    def __init__(self, url, username, password, hosts=[], hostgroup=''):
         self.__url = url
         self.__username = username
         self.__password = password
-        self.__hosts = hosts
-        self.__hostgroup = hostgroup
+        if len(hosts) != 0:
+            self.__hosts = hosts
+        if hostgroup != '':
+            self.__hostgroup = hostgroup
+
         if url and username and password:
             self.__zapi = ZabbixAPI(url, username, password)
             self.__zapi.login()
-            print('user is login')
-            # check if self.__hostgroup exists, if not create it
-            self.get_group_id(self.__hostgroup)
+            print('[ScreenFactory] user is login')
 
     def get_group_id(self, group_name):
         params = {
@@ -107,7 +108,7 @@ class ScreenFactory(object):
         :param key:
         :return:
         """
-        params = {"output": ["itemid"],  "hostids": hostid, "search": {"key_": key}}
+        params = {"output": ["itemid"],  "filter": {"hostid": hostid, "key_": key}}
         result = self.__zapi.item.get(params)
         try:
             if len(result) == 1:
@@ -118,17 +119,43 @@ class ScreenFactory(object):
         except IndexError:
             raise E3CZbxException('There is no key(%s) in host(hostid=%s)' % (key, hostid))
 
+    def get_graphid_by_name(self, name):
+        params = {"filter": {"name": name}}
+        result = self.__zapi.graph.get(params)
+        try:
+            if len(result) == 1:
+                graphid = result[0]['graphid']
+                return graphid
+            else:
+                raise E3CZbxException('There are no graph or more than one graph(%s) ' % name)
+        except IndexError:
+            raise E3CZbxException('There is no graph(%s)' % name)
+
     def create_graph(self, name, itemids, width=900,  height=400):
         params = {"name": name, "width": width, "height": height, "gitems": []}
 
         for itemid in itemids:
-            conf = {'itemid': itemid, 'color': self.__get_color()}
+            conf = {'itemid': itemid, 'color': self.__get_color(), "yaxisside": 0}
             params['gitems'].append(conf)
         # print(params)
 
-        result = self.__zapi.graph.create(params)
-        print("[SUCCESS] create graph: %s(graphid=%s)" % (name, result['graphids'][0]))
-        return result['graphids'][0]
+        # simple prcoss to let name like "Net_IO" graph's last half itemids's yaxisside=1
+        if 'Net_IO' in name:
+            start = int(len(params['gitems']) / 2)
+            for i in range(start, len(params['gitems'])):
+                # y轴右边显示，默认是左边
+                params['gitems'][i]['yaxisside'] = 1
+        try:
+            result = self.__zapi.graph.create(params)
+            print("[SUCCESS] create graph: %s(graphid=%s)" % (name, result['graphids'][0]))
+            return result['graphids'][0]
+        except E3CZbxException as e:
+            if 'exists in graphs or graph prototypes' in e.__str__():
+                graphid = self.get_graphid_by_name(name)
+                print("[SUCCESS] existed graph: %s(graphid=%s)" % (name, graphid))
+                return graphid
+            else:
+                raise E3CZbxException(e)
 
     def create_statistic_graphs(self):
         hostids = self.get_hosts_ids()
@@ -144,7 +171,14 @@ class ScreenFactory(object):
             resourceids.append(self.create_graph(graph_name, itemids))
         return resourceids
 
-    def create_screen(self, hsize=2, vsize=4):
+    def create_screen(self, hsize=2, vsize=4, hosts=[], group_name=''):
+        if len(hosts) != 0:
+            self.__hosts = hosts
+        if group_name != '':
+            self.__hostgroup = group_name
+            # check if self.__hostgroup exists, if not create it
+            self.get_group_id(self.__hostgroup)
+
         screen_name = " %s Statistics" % self.__hostgroup
         params = {
             "name": screen_name,
@@ -175,22 +209,15 @@ class ScreenFactory(object):
         print("[SUCCESS] create screen: %s(screenid=%s)" % (screen_name, result['screenids'][0]))
         return result['screenids'][0]
 
-    def create_screen_with_params(self, hosts, group_name):
-        self.__hosts = hosts
-        self.__hostgroup = group_name
-        # check if self.__hostgroup exists, if not create it
-        self.get_group_id(self.__hostgroup)
-
-        self.create_screen()
 
 if __name__ == '__main__':
 
     NginxServers = ['10.233.87.54']
     group_name = 'Nginx Servers'
-    proxy = ScreenFactory('http://10.233.87.241', 'admin', 'zabbix',
+    proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',
                            NginxServers,
                            group_name)
-    # proxy.create_screen()
+    proxy.create_screen()
 
     EsServers = ['10.230.135.126', '10.230.135.127', '10.230.135.128']
     # collectors '10.230.146.162', '10.230.146.163'的网口不是 eth0，导致错误
@@ -198,7 +225,7 @@ if __name__ == '__main__':
     IndexerServers = ['10.233.81.118', '10.233.81.208', '10.230.136.177']
     KafkaServers = ['10.230.135.124', '10.230.135.125', '10.230.134.225', '10.230.134.226']
 
-    # proxy.create_screen_with_params(EsServers, "Elasticsearch Servers")
-    # proxy.create_screen_with_params(CollectorServers, "Collector Servers")
-    # proxy.create_screen_with_params(IndexerServers, "Indexer Servers")
-    # proxy.create_screen_with_params(KafkaServers, "Kafka Servers")
+    # proxy.create_screen(hosts=EsServers, group_name="Elasticsearch Servers")
+    # proxy.create_screen(hosts=CollectorServers, group_name="Collector Servers")
+    # proxy.create_screen(hosts=IndexerServers, group_name="Indexer Servers")
+    # proxy.create_screen(hosts=KafkaServers, group_name="Kafka Servers")

@@ -14,17 +14,20 @@ class HostsFactory(object):
       used to create  host and  link  host  object to a  specific template
     """
 
-    def __init__(self, url, username, password, template_name, group, hosts):
+    def __init__(self, url, username, password, template_name='', group='', hosts=[]):
         self.__url = url
         self.__username = username
         self.__password = password
-        self.__template = template_name
-        self.__hosts = hosts
-        self.__group = group
+        if template_name != '':
+            self.__template = template_name
+        if group != '':
+            self.__group = group
+        if len(hosts) != 0:
+            self.__hosts = hosts
         if url and username and password:
             self.__zapi = ZabbixAPI(url, username, password)
             self.__zapi.login()
-            print('user is login')
+            print('[HostsFactory] user is login')
 
     def get_hostgroup_id(self, group_name):
         params = {
@@ -103,13 +106,24 @@ class HostsFactory(object):
             result = self.__zapi.host.create(params)
             print('[SUCCESS] create host: %s (hostid=%s) and link to template: %s' % (host, result['hostids'], self.__template))
         except E3CZbxException as e:
-            print(e)
+            if 'exists' in e.__str__():
+                print('[SUCCESS] existed host: %s' % (host))
+            else:
+                raise E3CZbxException(e)
 
-    def create_host_link_template(self):
+    def create_host_link_template(self, hosts=[], template_name='', group_name=''):
         """
         create hosts according to @self.hosts and link host to @self.__template
         :return:
         """
+        # initialize parameters
+        if template_name != '':
+            self.__template = template_name
+        if group_name != '':
+            self.__group = group_name
+        if len(hosts) != 0:
+            self.__hosts = hosts
+
         templateid = self.get_template_id()
         try:
             groupid = self.create_group(self.__group)
@@ -119,27 +133,21 @@ class HostsFactory(object):
         for host in self.__hosts:
             self.__create_host_helper(host, templateid, groupid)
 
-    def create_host_link_template_with_params(self, hosts, template_name, group_name):
-        self.__hosts = hosts
-        self.__template = template_name
-        self.__group = group_name
-        self.create_host_link_template()
-
 if __name__ == "__main__":
 
     NginxServer = ['10.233.87.54']
-    template_name = 'ulog_system_stats_template'
+    template_name = 'ulog_system_stats_template_zbx20'
 
-    host = HostsFactory('http://10.233.87.241', 'admin', 'zabbix', template_name,
+    host = HostsFactory('http://10.233.87.54:9090', 'admin', 'zabbix', template_name,
                         'Nginx Servers', ['10.233.87.54'])
-    # host.create_host_link_template()
+    host.create_host_link_template()
 
     EsServers = ['10.230.135.126', '10.230.135.127', '10.230.135.128']
     CollectorServers = ['10.233.86.204', '10.233.86.205', '10.230.146.162', '10.230.146.163']
     IndexerServers = ['10.233.81.118', '10.230.141.118', '10.233.81.208', '10.230.136.177']
     KafkaServers = ['10.230.135.124', '10.230.135.125', '10.230.134.225', '10.230.134.226']
 
-    host.create_host_link_template_with_params(EsServers, template_name, "Elasticsearch Servers")
-    host.create_host_link_template_with_params(CollectorServers, template_name, "Collector Servers")
-    host.create_host_link_template_with_params(IndexerServers, template_name, "Indexer Servers")
-    host.create_host_link_template_with_params(KafkaServers, template_name, "Kafka Servers")
+    # host.create_host_link_template(hosts=EsServers, group_name="Elasticsearch Servers")
+    # host.create_host_link_template(hosts=CollectorServers, group_name="Collector Servers")
+    # host.create_host_link_template(hosts=IndexerServers, group_name="Indexer Servers")
+    # host.create_host_link_template(hosts=KafkaServers, group_name="Kafka Servers")
