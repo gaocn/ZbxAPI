@@ -134,18 +134,18 @@ class HostsFactory(object):
             self.__create_host_helper(host, templateid, groupid)
 
 if __name__ == "__main__":
-
-    NginxServer = ['10.233.87.54']
-    template_name = 'ulog_system_stats_template_zbx20'
-
-    host = HostsFactory('http://10.233.87.54:9090', 'admin', 'zabbix', template_name,
-                        'Nginx Servers', ['10.233.87.54'])
-    host.create_host_link_template()
-
-    EsServers = ['10.230.135.126', '10.230.135.127', '10.230.135.128']
-    CollectorServers = ['10.233.86.204', '10.233.86.205', '10.230.146.162', '10.230.146.163']
-    IndexerServers = ['10.233.81.118', '10.230.141.118', '10.233.81.208', '10.230.136.177']
-    KafkaServers = ['10.230.135.124', '10.230.135.125', '10.230.134.225', '10.230.134.226']
+    pass
+    # NginxServer = ['10.233.87.54']
+    # template_name = 'ulog_system_stats_template_zbx20'
+    #
+    # host = HostsFactory('http://10.233.87.54:9090', 'admin', 'zabbix', template_name,
+    #                     'Nginx Servers', ['10.233.87.54'])
+    # host.create_host_link_template()
+    #
+    # EsServers = ['10.230.135.126', '10.230.135.127', '10.230.135.128']
+    # CollectorServers = ['10.233.86.204', '10.233.86.205', '10.230.146.162', '10.230.146.163']
+    # IndexerServers = ['10.233.81.118', '10.230.141.118', '10.233.81.208', '10.230.136.177']
+    # KafkaServers = ['10.230.135.124', '10.230.135.125', '10.230.134.225', '10.230.134.226']
 
     # host.create_host_link_template(hosts=EsServers, group_name="Elasticsearch Servers")
     # host.create_host_link_template(hosts=CollectorServers, group_name="Collector Servers")

@@ -211,19 +211,19 @@ class ScreenFactory(object):
 
 
 if __name__ == '__main__':
-
-    NginxServers = ['10.233.87.54']
-    group_name = 'Nginx Servers'
-    proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',
-                           NginxServers,
-                           group_name)
-    proxy.create_screen()
-
-    EsServers = ['10.230.135.126', '10.230.135.127', '10.230.135.128']
+    pass
+    # NginxServers = ['10.233.87.54']
+    # group_name = 'Nginx Servers'
+    # proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',
+    #                        NginxServers,
+    #                        group_name)
+    # proxy.create_screen()
+    #
+    # EsServers = ['10.230.135.126', '10.230.135.127', '10.230.135.128']
     # collectors '10.230.146.162', '10.230.146.163'的网口不是 eth0，导致错误
-    CollectorServers = ['10.233.86.204', '10.233.86.205']
-    IndexerServers = ['10.233.81.118', '10.233.81.208', '10.230.136.177']
-    KafkaServers = ['10.230.135.124', '10.230.135.125', '10.230.134.225', '10.230.134.226']
+    # CollectorServers = ['10.233.86.204', '10.233.86.205']
+    # IndexerServers = ['10.233.81.118', '10.233.81.208', '10.230.136.177']
+    # KafkaServers = ['10.230.135.124', '10.230.135.125', '10.230.134.225', '10.230.134.226']
 
     # proxy.create_screen(hosts=EsServers, group_name="Elasticsearch Servers")
     # proxy.create_screen(hosts=CollectorServers, group_name="Collector Servers")
