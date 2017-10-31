@@ -5,8 +5,8 @@
 # Author:  govind
 ################################
 
-from zbxapi import ZabbixAPI
 from exception.e3cexceptions import E3CZbxException
+from zbx.zbxapi import ZabbixAPI
 
 
 class ScreenFactory(object):
