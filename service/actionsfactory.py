@@ -32,7 +32,7 @@ class ActionsFactory(object):
         return wrapper
 
     @valid_check
-    def __init__(self, url, username, password, hosts=[], trigger_names=[]):
+    def __init__(self, url, username, password, hosts=[], trigger_names=''):
 
         self.__url = url
         self.__username = username
@@ -43,9 +43,9 @@ class ActionsFactory(object):
         print('[ActionsFactory] user is login')
 
         if len(hosts) != 0:
-            self.__hosts_ids = self.get_hostids_by_IP(hosts)
-        if len(trigger_names) != 0:
-            self.__triggers_names = trigger_names
+            self.__hosts_ids = self.__get_hostids_by_IP(hosts)
+        if trigger_names != '':
+            self.__triggers_name = trigger_names
 
     def __get_hostids_by_IP(self, hosts):
         host_ids = []
@@ -67,8 +67,8 @@ class ActionsFactory(object):
             "evaltype": 0,
             "status": 0,                        # enable
             "esc_period": period,               # Action执行周期，默认为3600s
-            "def_shortdata": "{TRIGGER.NAME}: {TRIGGER.STATUS}",
-            "def_longdata": "{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}",
+            "def_shortdata": "",
+            "def_longdata": "",
             "conditions": [
                 {                               # Maintenance status not in "maintenance"
                     "conditiontype": 16,
@@ -117,22 +117,25 @@ class ActionsFactory(object):
             ]
         }
         try:
-            result = self.__zapi.trigger.create(params)
-            print('[SUCCESS] %s' % result)
+            result = self.__zapi.action.create(params)
+            print('[SUCCESS] create action "%s(actionid=%s)"' % (action_name, result['actionids'][0]))
         except E3CZbxException as e:
-            print(e)
+            if 'exists' in e.__str__():
+                print('[SUCCESS] existed action "%s"' % action_name)
+            else:
+                raise E3CZbxException(e)
 
-    def create_action(self, action_name, command, hosts=[], trigger_names=[]):
+    def create_action(self, action_name, command, hosts=[], trigger_name=''):
         if len(hosts) != 0:
-            self.__hosts_ids = self.get_hostids_by_IP(hosts)
-        if len(trigger_names) != 0:
-            self.__triggers_names = trigger_names
+            self.__hosts_ids = self.__get_hostids_by_IP(hosts)
+        if trigger_name != '':
+            self.__triggers_name = trigger_name
 
         for hostid in self.__hosts_ids:
-            for trigger_name in self.__triggers_names:
-                self.create_action_helper(action_name, hostid, trigger_name, command)
+                self.__create_action_helper(action_name, hostid, self.__triggers_name, command)
 
 
 if __name__ == '__main__':
-    af = ActionsFactory('http://10.233.87.54:9090', 'admin', 'zabbix', hosts=['10.230.135.12', '10.233.87.54'], trigger_names=['nginx'])
-    af.create_action('from zbx api', 'cd ~; ./test.sh')
+    # af = ActionsFactory('http://10.233.87.54:9090', 'admin', 'zabbix')
+    # af.create_action('if there is no elasticsearch process', 'cd ~; echo "$(pwd)" > ./zbx.log', ['10.233.87.54'], 'Elsaticsearch')
+    pass

@@ -9,5 +9,15 @@
     "CollectorServers": ["10.233.86.204", "10.233.86.205"],
     "IndexerServers": ["10.233.81.118", "10.230.141.118", "10.233.81.208", "10.230.136.177"],
     "KafkaServers": ["10.230.135.124", "10.230.135.125", "10.230.134.225", "10.230.134.226"]
+  },
+  "ActionMap": {
+    "NginxServers": {
+      "actionName": "if there is no elasticsearch process",
+      "command": "cd ~; echo \"$(pwd)\" > ./zbx.log",
+      "triggerNamePattern": "Elsaticsearch"
+    },
+    "EsServers": {
+
+    }
   }
 }
