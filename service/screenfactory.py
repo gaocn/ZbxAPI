@@ -204,10 +204,15 @@ class ScreenFactory(object):
                 }
                 params['screenitems'].append(screenitem)
         # print(params)
-
-        result = self.__zapi.screen.create(params)
-        print("[SUCCESS] create screen: %s(screenid=%s)" % (screen_name, result['screenids'][0]))
-        return result['screenids'][0]
+        try:
+            result = self.__zapi.screen.create(params)
+            print("[SUCCESS] create screen: %s(screenid=%s)" % (screen_name, result['screenids'][0]))
+            return result['screenids'][0]
+        except E3CZbxException as e:
+            if 'exists' in e.__str__():
+                print("[SUCCESS] existed screen: %s" % screen_name)
+            else:
+                raise E3CZbxException(e)
 
 
 if __name__ == '__main__':
