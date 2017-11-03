@@ -4,7 +4,7 @@
   "password": "zabbix",
   "template": "ulog_system_stats_template_zbx20",
   "ServerMap": {
-    "NginxServers": ["10.233.87.54"],
+    "NginxServers": ["10.235.130.157","10.235.130.158"],
     "EsServers": ["10.230.135.126", "10.230.135.127", "10.230.135.128"],
     "CollectorServers": ["10.233.86.204", "10.233.86.205"],
     "IndexerServers": ["10.233.81.118", "10.230.141.118", "10.233.81.208", "10.230.136.177"],
@@ -14,40 +14,40 @@
     "NginxServers": [
       {
         "actionName": "Gateway process is down, report to administrator",
-        "command": "/bin/bash /home/sm01/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'GatewayProcess'",
+        "command": "/bin/bash /home/e3capp/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'GatewayProcess'",
         "triggerNamePattern": "Nginx"
       }
     ],
     "EsServers": [
       {
         "actionName": "Es process is down, report to administrator",
-        "command": "/bin/bash /home/e3c/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'ESProcess'",
+        "command": "/bin/bash /home/e3capp/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'ESProcess'",
         "triggerNamePattern": "Elasticsearch"
       },
       {
         "actionName": "Filesystem used percent is > 85",
-        "command": "/bin/bash /home/e3c/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'DiskAlert'",
+        "command": "/bin/bash /home/e3capp/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'DiskAlert'",
         "triggerNamePattern": "Filesystem"
       }
     ],
     "CollectorServers": [
       {
         "actionName": "Collector process is down, report to administrator",
-        "command": "/bin/bash /home/e3c/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'CollectorProcess'",
+        "command": "/bin/bash /home/e3capp/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'CollectorProcess'",
         "triggerNamePattern": "Collector"
       }
     ],
     "IndexerServers": [
       {
         "actionName": "Indexer process is down, report to administrator",
-        "command": "/bin/bash /home/e3c/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'IndexerESProcess'",
+        "command": "/bin/bash /home/e3capp/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'IndexerESProcess'",
         "triggerNamePattern": "Indexer"
       }
     ],
     "KafkaServers": [
       {
         "actionName": "Kafka process is down, report to administrator",
-        "command": "/bin/bash /home/e3c/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'KafkaProcess'",
+        "command": "/bin/bash /home/e3capp/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'KafkaProcess'",
         "triggerNamePattern": "Kafka"
       }
     ]
