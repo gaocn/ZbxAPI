@@ -8,7 +8,6 @@
 from service.hostsfactory import HostsFactory
 from service.screenfactory import ScreenFactory
 from service.actionsfactory import ActionsFactory
-from exception.e3cexceptions import E3CZbxException
 import json
 
 
@@ -30,9 +29,9 @@ class HostsScreenCreator(object):
         self.action_proxy = ActionsFactory(url, user, password)
 
     def auto_creator(self):
-        # for key in self.conf['ServerMap']:
-        #     self.host_proxy.create_host_link_template(hosts=self.conf['ServerMap'][key], group_name=key)
-        #     self.screen_proxy.create_screen(hosts=self.conf['ServerMap'][key], group_name=key)
+        for key in self.conf['ServerMap']:
+            self.host_proxy.create_host_link_template(hosts=self.conf['ServerMap'][key], group_name=key)
+            self.screen_proxy.create_screen(hosts=self.conf['ServerMap'][key], group_name=key)
         # create action config
         for item in self.conf['ActionMap']:
             try:
@@ -48,6 +47,6 @@ class HostsScreenCreator(object):
 
 
 if __name__ == '__main__':
-    hsc = HostsScreenCreator()
+    hsc = HostsScreenCreator(file='data/conf.json')
     hsc.auto_creator()
 
