@@ -110,7 +110,7 @@ class ActionsFactory(object):
                     ],
                     "opcommand": {
                         "type": 0,
-                        "execute_on": 0,
+                        "execute_on": 1,   # 1 在zabbix server上执行，0 在zabbix agent上执行
                         "command": command
                     }
                 }

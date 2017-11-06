@@ -14,12 +14,12 @@
     "EsServers": [
       {
         "actionName": "Es process is down, report to administrator",
-        "command": "/bin/bash /home/e3c/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'ESProcess'",
+        "command": "/bin/bash /home/e3c/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'ESProcess' {HOST.NAME}",
         "triggerNamePattern": "Elasticsearch"
       },
       {
         "actionName": "Filesystem used percent is > 85",
-        "command": "/bin/bash /home/e3c/zabbix20-agent/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'DiskAlert'",
+        "command": "/bin/bash /home/e3c/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'DiskAlert' {HOST.NAME}",
         "triggerNamePattern": "Filesystem"
       }
     ]
