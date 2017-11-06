@@ -132,7 +132,7 @@ class ActionsFactory(object):
             self.__triggers_name = trigger_name
 
         for hostid in self.__hosts_ids:
-                self.__create_action_helper(action_name, hostid, self.__triggers_name, command)
+                self.__create_action_helper('[hostid=%s]%s' % (hostid, action_name), hostid, self.__triggers_name, command)
 
 
 if __name__ == '__main__':

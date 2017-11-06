@@ -34,16 +34,16 @@ class HostsScreenCreator(object):
             self.screen_proxy.create_screen(hosts=self.conf['ServerMap'][key], group_name=key)
         # create action config
         for item in self.conf['ActionMap']:
-            try:
-                action = self.conf['ActionMap'][item]
-                hosts = self.conf['ServerMap'][item]
-                action_name = action['actionName']
-                command = action['command']
-                trigger_name_pattern = action['triggerNamePattern']
-                print(action_name)
-                self.action_proxy.create_action(action_name, command, hosts, trigger_name_pattern)
-            except KeyError as e:
-                print('[ERROR] configuration error for "ActionMap ==>%s"' % item)
+            for action in self.conf['ActionMap'][item]:
+                try:
+                    hosts = self.conf['ServerMap'][item]
+                    action_name = action['actionName']
+                    command = action['command']
+                    trigger_name_pattern = action['triggerNamePattern']
+                    # print(action_name)
+                    self.action_proxy.create_action(action_name, command, hosts, trigger_name_pattern)
+                except KeyError as e:
+                    print('[ERROR] configuration error for "ActionMap ==>%s"' % item)
 
 
 if __name__ == '__main__':
