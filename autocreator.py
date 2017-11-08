@@ -13,10 +13,14 @@ import json
 
 class HostsScreenCreator(object):
 
-    def __init__(self, file='data/conf.json'):
+    def __init__(self, file):
         with open(file, 'rb') as fd:
             self.conf = json.load(fd)
             self.__init_config()
+
+    def __reconfig(self, file):
+        with open(file, 'rb') as fd:
+            self.conf = json.load(fd)
 
     def __init_config(self):
         url = self.conf['url']
@@ -28,7 +32,10 @@ class HostsScreenCreator(object):
         self.host_proxy = HostsFactory(url, user, password, template_name)
         self.action_proxy = ActionsFactory(url, user, password)
 
-    def auto_creator(self):
+    def auto_creator(self, file=''):
+        if file != '':
+            self.__reconfig(file)
+
         for key in self.conf['ServerMap']:
             self.host_proxy.create_host_link_template(hosts=self.conf['ServerMap'][key], group_name=key)
             self.screen_proxy.create_screen(hosts=self.conf['ServerMap'][key], group_name=key)
@@ -49,4 +56,9 @@ class HostsScreenCreator(object):
 if __name__ == '__main__':
     hsc = HostsScreenCreator(file='data/conf.json')
     hsc.auto_creator()
+    # hsc.auto_creator(file='data/conf_product_monitores.json')
+    # hsc.auto_creator(file='data/conf_product_ulog.json')
+    # hsc.auto_creator(file='data/conf_product_ulog2.json')
+    # hsc.auto_creator(file='data/conf_product_others.json')
+    # hsc.auto_creator(file='data/conf_product_win.json')
 

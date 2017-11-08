@@ -1,14 +1,14 @@
 {
-  "url": "http://10.233.87.54:9090",
+  "url": "http://10.235.100.73:9081",
   "user": "admin",
   "password": "zabbix",
   "template": "ulog_system_stats_template_zbx20",
   "ServerMap": {
     "NginxServers": ["10.235.130.157","10.235.130.158"],
-    "EsServers": ["10.230.135.126", "10.230.135.127", "10.230.135.128"],
-    "CollectorServers": ["10.233.86.204", "10.233.86.205"],
-    "IndexerServers": ["10.233.81.118", "10.230.141.118", "10.233.81.208", "10.230.136.177"],
-    "KafkaServers": ["10.230.135.124", "10.230.135.125", "10.230.134.225", "10.230.134.226"]
+    "MonitorEsServers": ["10.235.237.20","10.235.237.21","10.235.237.22","10.235.237.23","10.235.237.24","10.235.237.25","10.235.237.26","10.235.237.218","10.235.237.219","10.235.237.220","10.235.237.221","10.235.237.222"],
+    "MonitorCollectorServers": ["10.235.237.71","10.235.237.72","10.235.237.228","10.235.237.229","10.235.237.230","10.235.237.231"],
+    "MonitorIndexerServers": ["10.235.237.27","10.235.237.28","10.235.237.29","10.235.237.232","10.235.237.233"],
+    "MonitorKafkaServers": ["10.235.237.69","10.235.237.70","10.235.237.71","10.235.237.72","10.235.89.196"]
   },
   "ActionMap": {
     "NginxServers": [
@@ -18,7 +18,7 @@
         "triggerNamePattern": "Nginx"
       }
     ],
-    "EsServers": [
+    "MonitorEsServers": [
       {
         "actionName": "Es process is down, report to administrator",
         "command": "/bin/bash /home/e3capp/zabbix20/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'ESProcess' {HOST.NAME}",
@@ -30,21 +30,21 @@
         "triggerNamePattern": "Filesystem"
       }
     ],
-    "CollectorServers": [
+    "MonitorCollectorServers": [
       {
         "actionName": "Collector process is down, report to administrator",
         "command": "/bin/bash /home/e3capp/zabbix20/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'CollectorProcess' {HOST.NAME}",
         "triggerNamePattern": "Collector"
       }
     ],
-    "IndexerServers": [
+    "MonitorIndexerServers": [
       {
         "actionName": "Indexer process is down, report to administrator",
         "command": "/bin/bash /home/e3capp/zabbix20/zabbix20/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'IndexerESProcess' {HOST.NAME}",
         "triggerNamePattern": "Indexer"
       }
     ],
-    "KafkaServers": [
+    "MonitorKafkaServers": [
       {
         "actionName": "Kafka process is down, report to administrator",
         "command": "/bin/bash /home/e3capp/zabbix20/zabbix20/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'KafkaProcess' {HOST.NAME}",

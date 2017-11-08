@@ -4,22 +4,18 @@
   "password": "zabbix",
   "template": "ulog_system_stats_template_zbx20",
   "ServerMap": {
-    "NginxServers": ["10.233.87.54"],
-    "EsServers": ["10.230.135.126", "10.230.135.127", "10.230.135.128"],
-    "CollectorServers": ["10.233.86.204", "10.233.86.205"],
-    "IndexerServers": ["10.233.81.118", "10.230.141.118", "10.233.81.208", "10.230.136.177"],
-    "KafkaServers": ["10.230.135.124", "10.230.135.125", "10.230.134.225", "10.230.134.226"]
+    "EsServers": ["10.230.135.126", "10.230.135.127", "10.230.135.128"]
   },
   "ActionMap": {
     "EsServers": [
       {
         "actionName": "Es process is down, report to administrator",
-        "command": "/bin/bash /home/e3c/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'ESProcess' {HOST.NAME}",
+        "command": "/bin/bash /??/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'ESProcess' {HOST.NAME}",
         "triggerNamePattern": "Elasticsearch"
       },
       {
         "actionName": "Filesystem used percent is > 85",
-        "command": "/bin/bash /home/e3c/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'DiskAlert' {HOST.NAME}",
+        "command": "/bin/bash /??/zabbix20-server/etc/usr_local_bin/alert.sh {TRIGGER.NAME} {TRIGGER.STATUS} {TRIGGER.SEVERITY} 'DiskAlert' {HOST.NAME}",
         "triggerNamePattern": "Filesystem"
       }
     ]

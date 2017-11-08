@@ -58,6 +58,18 @@ class HostsFactory(object):
         else:
             raise E3CZbxException('there are more than one groups')
 
+    def get_host_id(self, host):
+        param = {
+            "filter": {
+                "name": host
+            }
+        }
+        try:
+            result = self.__zapi.host.get(param)
+            return result[0]['hostid']
+        except:
+            raise E3CZbxException('there is no host named "%s"' % host)
+
     def get_template_id(self):
         var = self.__zapi.template.get({
             "output": [
@@ -154,7 +166,9 @@ class HostsFactory(object):
             self.disable_service(result['hostids'])
         except E3CZbxException as e:
             if 'exists' in e.__str__():
-                print('[SUCCESS] existed host: %s' % (host))
+                hostid = self.get_host_id(host)
+                self.disable_service(hostid)
+                print('[SUCCESS] existed host: %s (hostid=%s)' % (host, hostid))
             else:
                 raise E3CZbxException(e)
 
