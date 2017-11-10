@@ -197,8 +197,8 @@ class ScreenFactory(object):
                     "resourceid": resourceids[2 * y + x],
                     "rowspan": 1,
                     "colspan": 1,
-                    "width": 900,
-                    "height": 400,
+                    "width": 800,
+                    "height": 300,
                     "x": x,
                     "y": y
                 }
