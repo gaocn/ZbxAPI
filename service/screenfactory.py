@@ -24,6 +24,18 @@ class ScreenFactory(object):
 
         1. check if there exists hosts and  host group
     """
+
+    """
+        NOTE: 因为不同机器中的网口可能不同（eth0, eth1, eth2,....),并且不同机器上ES存放数据的挂载点也不相同，因此需要这里的items
+              参数就不能是固定值。
+              
+              规定： 
+                1. ES节点，挂载点是/home/{USER}/san 可以通过在在模板文件中定义；
+                2. 当对磁盘读写数据速度进行测试时，默认是sda，可以通过在模板文件中定义；
+                3. 不同机器上端口号可能不同，因此端口号需要指定；
+    
+    """
+
     __items = {
         'CPU_Load': ['system.cpu.load[percpu,avg1]'],
         'CPU_Utilization': ['system.cpu.util[,iowait]', 'system.cpu.util[,user]', 'system.cpu.util[,system]'],
