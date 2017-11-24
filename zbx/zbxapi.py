@@ -7,8 +7,8 @@
 
 from exception.e3cexceptions import E3CZbxException
 import json
-import subprocess
 import urllib
+import ssl
 from urllib import request
 
 
@@ -70,6 +70,8 @@ class ZabbixAPI(object):
             'Content-Type': 'application/json-rpc',
             'User-Agent': 'python/zabbix_api'
         }
+        # 若是HTTPS请求，则不验证证书
+        ssl._create_default_https_context = ssl._create_unverified_context
 
         req = request.Request(self.__url, data=data, headers=headers)
         opener = request.urlopen(req, timeout=3)
