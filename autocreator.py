@@ -36,9 +36,28 @@ class HostsScreenCreator(object):
         if file != '':
             self.__reconfig(file)
 
+        self.auto_create_host()
+        self.auto_create_screen()
+        self.auto_create_action()
+
+    def auto_create_host(self, file=''):
+        if file != '':
+            self.__reconfig(file)
+
         for key in self.conf['ServerMap']:
             self.host_proxy.create_host_link_template(hosts=self.conf['ServerMap'][key], group_name=key)
+
+    def auto_create_screen(self, file=''):
+        if file != '':
+            self.__reconfig(file)
+
+        for key in self.conf['ServerMap']:
             self.screen_proxy.create_screen(hosts=self.conf['ServerMap'][key], group_name=key)
+
+    def auto_create_action(self, file=''):
+        if file != '':
+            self.__reconfig(file)
+
         # create action config
         for item in self.conf['ActionMap']:
             for action in self.conf['ActionMap'][item]:
@@ -52,10 +71,10 @@ class HostsScreenCreator(object):
                 except KeyError as e:
                     print('[ERROR] configuration error for "ActionMap ==>%s"' % item)
 
-
 if __name__ == '__main__':
-    hsc = HostsScreenCreator(file='data/conf.json')
-    hsc.auto_creator()
+    hsc = HostsScreenCreator(file='data/conf_product_nginx.json')
+    # hsc.auto_creator()
+    hsc.auto_create_action()
     # hsc.auto_creator(file='data/conf_product_monitores.json')
     # hsc.auto_creator(file='data/conf_product_ulog.json')
     # hsc.auto_creator(file='data/conf_product_ulog2.json')
