@@ -33,6 +33,14 @@ class ScreenFactory(object):
                 1. ES节点，挂载点是/home/{USER}/san 可以通过在在模板文件中定义；
                 2. 当对磁盘读写数据速度进行测试时，默认是sda，可以通过在模板文件中定义；
                 3. 不同机器上端口号可能不同，因此端口号需要指定；
+                
+        解决方案：
+           1. 根据模板名称，解析参数，例如：
+                ulog_system_stats_template_zbx20_eth1_sda_home
+                ulog_system_stats_template_zbx20_eth2_sdb_nas
+                ulog_system_stats_template_zbx20_eth3_sda_san
+              通过解析最后三个字符对__items中的相关常量进行设置，但是这种方法在文件名变动时失效。
+           2. 通过传递参数 eth0..9、sd[a-f]、[home|san|nas]来判断应该如何设置响应的__items中的常量
     
     """
 
@@ -40,11 +48,15 @@ class ScreenFactory(object):
         'CPU_Load': ['system.cpu.load[percpu,avg1]'],
         'CPU_Utilization': ['system.cpu.util[,iowait]', 'system.cpu.util[,user]', 'system.cpu.util[,system]'],
         'Memory': ['vm.memory.size[used]'],
-        'Filesystem': ['custom.ulog.fs.stats.used_percent[/home]'],
-        'Income_Net_IO': ['net.if.in[eth0,bytes]', 'custom.if.net.income.bandwidth.util'],
-        'Outcome_Net_IO': ['net.if.out[eth0,bytes]', 'custom.if.net.outcome.bandwidth.util'],
-        'Read_Disk_IO': ['custom.vfs.dev.iostats.rkb[sda]'],
-        'Write_Disk_IO': ['custom.vfs.dev.iostats.wkb[sda]']
+        # 'Filesystem': ['custom.ulog.fs.stats.used_percent[/home]'],
+
+        # 'net.if.in[eth0,bytes]'
+        'Income_Net_IO': ['custom.if.net.income.bandwidth.util'],
+
+        # 'net.if.out[eth0,bytes]',
+        'Outcome_Net_IO': ['custom.if.net.outcome.bandwidth.util'],
+        # 'Read_Disk_IO': ['custom.vfs.dev.iostats.rkb[sda]'],
+        # 'Write_Disk_IO': ['custom.vfs.dev.iostats.wkb[sda]']
     }
     __colors = [
         '1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0', '5CCD18',
@@ -58,10 +70,27 @@ class ScreenFactory(object):
         self.__color_indicator = (self.__color_indicator + 1) % len(self.__colors)
         return color
 
-    def __init__(self, url, username, password, hosts=[], hostgroup=''):
+    def __init__(self, url, username, password, hosts=[], hostgroup='', item_net_interface='eth0', item_disk='sda', item_dir='home'):
         self.__url = url
         self.__username = username
         self.__password = password
+
+        if item_dir == 'home':
+            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/%s]' % item_dir]
+        elif item_dir == 'san':
+            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % item_dir]
+        elif item_dir == 'nas':
+            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % item_dir]
+        else:
+            raise E3CZbxException("Illegal item_dir[%s] parameter" % item_dir)
+
+        self.__items['Income_Net_IO'] = ['net.if.in[%s,bytes]' % item_net_interface]
+        self.__items['Outcome_Net_IO'].append('net.if.out[%s,bytes]' % item_net_interface)
+        self.__items['Read_Disk_IO'] = ['custom.vfs.dev.iostats.rkb[%s]' % item_disk]
+        self.__items['Write_Disk_IO'] = ['custom.vfs.dev.iostats.wkb[%s]' % item_dir]
+
+        print(self.__items)
+
         if len(hosts) != 0:
             self.__hosts = hosts
         if hostgroup != '':
@@ -229,11 +258,11 @@ class ScreenFactory(object):
 
 if __name__ == '__main__':
     pass
-    # NginxServers = ['10.233.87.54']
-    # group_name = 'Nginx Servers'
-    # proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',
-    #                        NginxServers,
-    #                        group_name)
+    NginxServers = ['10.233.87.54']
+    group_name = 'Nginx Servers'
+    # proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',NginxServers,group_name)
+    proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',NginxServers,group_name, 'eth1', 'sab', 'nas')
+    # proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',NginxServers,group_name, 'eth2', 'sab', 'san')
     # proxy.create_screen()
     #
     # EsServers = ['10.230.135.126', '10.230.135.127', '10.230.135.128']
