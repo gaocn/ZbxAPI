@@ -92,10 +92,16 @@ class HostsScreenCreator(object):
 if __name__ == '__main__':
     hsc = HostsScreenCreator(file='data/conf_product_nginx.json')
     hsc.auto_creator()
-    # hsc.auto_create_action()
+
+    # hsc.auto_creator(file='data/conf_product_monitores_es.json')
     # hsc.auto_creator(file='data/conf_product_monitores.json')
+
+    # hsc.auto_creator(file='data/conf_product_ulog_es.json')
     # hsc.auto_creator(file='data/conf_product_ulog.json')
+
+    # hsc.auto_creator(file='data/conf_product_ulog2_es.json')
     # hsc.auto_creator(file='data/conf_product_ulog2.json')
-    # hsc.auto_creator(file='data/conf_product_others.json')
-    # hsc.auto_creator(file='data/conf_product_win.json')
+
+    # hsc.auto_creator(file='data/conf_product_mbank_es.json')
+    # hsc.auto_creator(file='data/conf_product_apm_es.json')
 

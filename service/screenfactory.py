@@ -46,16 +46,20 @@ class ScreenFactory(object):
     __items = {
         'CPU_Load': ['system.cpu.load[percpu,avg1]'],
         'CPU_Utilization': ['system.cpu.util[,iowait]', 'system.cpu.util[,user]', 'system.cpu.util[,system]'],
+
         'Memory': ['vm.memory.size[used]'],
         # 'Filesystem': ['custom.ulog.fs.stats.used_percent[/home]'],
+        'Filesystem': [],               # 为确保各个图形为位置，需要每个item有序。
 
         # 'net.if.in[eth0,bytes]'
         'Income_Net_IO': ['custom.if.net.income.bandwidth.util'],
-
         # 'net.if.out[eth0,bytes]',
         'Outcome_Net_IO': ['custom.if.net.outcome.bandwidth.util'],
+
         # 'Read_Disk_IO': ['custom.vfs.dev.iostats.rkb[sda]'],
+        'Read_Disk_IO': [],
         # 'Write_Disk_IO': ['custom.vfs.dev.iostats.wkb[sda]']
+        'Write_Disk_IO': []
     }
     __colors = [
         '1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0', '5CCD18',
@@ -78,17 +82,17 @@ class ScreenFactory(object):
         if len(items) != 3:
             raise E3CZbxException("Illegal Parameters: '%s'" % items)
 
-        self.__items['Income_Net_IO'] = ['net.if.in[%s,bytes]' % items[0]]
+        self.__items['Income_Net_IO'].append('net.if.in[%s,bytes]' % items[0])
         self.__items['Outcome_Net_IO'].append('net.if.out[%s,bytes]' % items[0])
-        self.__items['Read_Disk_IO'] = ['custom.vfs.dev.iostats.rkb[%s]' % items[1]]
-        self.__items['Write_Disk_IO'] = ['custom.vfs.dev.iostats.wkb[%s]' % items[1]]
+        self.__items['Read_Disk_IO'].append('custom.vfs.dev.iostats.rkb[%s]' % items[1])
+        self.__items['Write_Disk_IO'].append('custom.vfs.dev.iostats.wkb[%s]' % items[1])
 
         if items[2] == 'home':
-            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/%s]' % items[2]]
+            self.__items['Filesystem'].append('custom.ulog.fs.stats.used_percent[/%s]' % items[2])
         elif items[2] == 'san':
-            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % items[2]]
+            self.__items['Filesystem'].append('custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % items[2])
         elif items[2] == 'nas':
-            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % items[2]]
+            self.__items['Filesystem'].append('custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % items[2])
         else:
             raise E3CZbxException("Illegal item_dir[%s] parameter" % items[2])
 
