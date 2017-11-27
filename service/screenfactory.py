@@ -43,7 +43,6 @@ class ScreenFactory(object):
            2. 通过传递参数 eth0..9、sd[a-f]、[home|san|nas]来判断应该如何设置响应的__items中的常量
     
     """
-
     __items = {
         'CPU_Load': ['system.cpu.load[percpu,avg1]'],
         'CPU_Utilization': ['system.cpu.util[,iowait]', 'system.cpu.util[,user]', 'system.cpu.util[,system]'],
@@ -70,26 +69,30 @@ class ScreenFactory(object):
         self.__color_indicator = (self.__color_indicator + 1) % len(self.__colors)
         return color
 
-    def __init__(self, url, username, password, hosts=[], hostgroup='', item_net_interface='eth0', item_disk='sda', item_dir='home'):
+    def __init__(self, url, username, password, hosts=[], hostgroup='', items=['eth0', 'sda', 'home']):
         self.__url = url
         self.__username = username
         self.__password = password
 
-        if item_dir == 'home':
-            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/%s]' % item_dir]
-        elif item_dir == 'san':
-            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % item_dir]
-        elif item_dir == 'nas':
-            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % item_dir]
+        # configuration __items
+        if len(items) != 3:
+            raise E3CZbxException("Illegal Parameters: '%s'" % items)
+
+        self.__items['Income_Net_IO'] = ['net.if.in[%s,bytes]' % items[0]]
+        self.__items['Outcome_Net_IO'].append('net.if.out[%s,bytes]' % items[0])
+        self.__items['Read_Disk_IO'] = ['custom.vfs.dev.iostats.rkb[%s]' % items[1]]
+        self.__items['Write_Disk_IO'] = ['custom.vfs.dev.iostats.wkb[%s]' % items[1]]
+
+        if items[2] == 'home':
+            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/%s]' % items[2]]
+        elif items[2] == 'san':
+            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % items[2]]
+        elif items[2] == 'nas':
+            self.__items['Filesystem'] = ['custom.ulog.fs.stats.used_percent[/home/e3capp/%s]' % items[2]]
         else:
-            raise E3CZbxException("Illegal item_dir[%s] parameter" % item_dir)
+            raise E3CZbxException("Illegal item_dir[%s] parameter" % items[2])
 
-        self.__items['Income_Net_IO'] = ['net.if.in[%s,bytes]' % item_net_interface]
-        self.__items['Outcome_Net_IO'].append('net.if.out[%s,bytes]' % item_net_interface)
-        self.__items['Read_Disk_IO'] = ['custom.vfs.dev.iostats.rkb[%s]' % item_disk]
-        self.__items['Write_Disk_IO'] = ['custom.vfs.dev.iostats.wkb[%s]' % item_dir]
-
-        print(self.__items)
+        # print(self.__items)
 
         if len(hosts) != 0:
             self.__hosts = hosts
@@ -261,7 +264,7 @@ if __name__ == '__main__':
     NginxServers = ['10.233.87.54']
     group_name = 'Nginx Servers'
     # proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',NginxServers,group_name)
-    proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',NginxServers,group_name, 'eth1', 'sab', 'nas')
+    proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',NginxServers, group_name, 'eth1', 'sab', 'nas')
     # proxy = ScreenFactory('http://10.233.87.54:9090', 'admin', 'zabbix',NginxServers,group_name, 'eth2', 'sab', 'san')
     # proxy.create_screen()
     #
