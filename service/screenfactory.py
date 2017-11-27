@@ -175,7 +175,7 @@ class ScreenFactory(object):
         except IndexError:
             raise E3CZbxException('There is no graph(%s)' % name)
 
-    def create_graph(self, name, itemids, width=900,  height=400):
+    def create_graph(self, name, itemids, width=900,  height=200):
         params = {"name": name, "width": width, "height": height, "gitems": []}
 
         for itemid in itemids:
@@ -242,7 +242,7 @@ class ScreenFactory(object):
                     "rowspan": 1,
                     "colspan": 1,
                     "width": 500,
-                    "height": 300,
+                    "height": 200,
                     "x": x,
                     "y": y
                 }

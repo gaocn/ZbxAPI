@@ -117,11 +117,11 @@ class HostsFactory(object):
         :param hostid:
         :return:
         """
-        item_keys = ['kafka', 'es', 'collector', 'indexer', 'ngx']
+        item_keys = {'kafka': 'kafka', 'es': 'es', 'collector': 'collector', 'indexer': 'indexer', 'ngx': 'nginx'}
         itemids = []
 
         for key in item_keys:
-            if key in self.__group.lower():
+            if item_keys[key] in self.__group.lower():
                 continue
             itemid = self.get_item_id(key, hostid)
             if itemid != -1:
